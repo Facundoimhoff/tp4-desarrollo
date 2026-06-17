@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     const { apellido } = req.query; // Atrapamos el parámetro de la URL 
     const jugadorWhere = {};
 
-    // Si mandaron un apellido, armamos el filtro para buscar coincidencias 
+    // Si mandaron un apellido, armamos el filtro para buscar coincidencias     
     if (apellido) {
       jugadorWhere.apellido = {
         [Op.like]: `%${apellido}%` // Busca cualquier apellido que contenga ese texto 
