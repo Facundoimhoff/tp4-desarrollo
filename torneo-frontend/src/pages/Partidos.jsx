@@ -1,5 +1,9 @@
 function Partidos() {
-  return <h2 className="m-4">Partidos</h2>
+  return (
+    <div className="container mt-4">
+      <h1>Partidos</h1>
+    </div>
+  );
 }
 
-export default Partidos
+export default Partidos;

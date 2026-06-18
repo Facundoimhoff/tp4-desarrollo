@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -6,44 +6,30 @@ function Navbar() {
       <div className="container">
 
         <Link className="navbar-brand" to="/">
-          TorneoApp
+          ⚽ Torneo
         </Link>
 
         <div>
-
-          <Link
-            className="btn btn-outline-light me-2"
-            to="/torneos"
-          >
-            Torneos
+          <Link className="btn btn-outline-light me-2" to="/">
+            Dashboard
           </Link>
 
-          <Link
-            className="btn btn-outline-light me-2"
-            to="/equipos"
-          >
+          <Link className="btn btn-outline-light me-2" to="/equipos">
             Equipos
           </Link>
 
-          <Link
-            className="btn btn-outline-light me-2"
-            to="/jugadores"
-          >
+          <Link className="btn btn-outline-light me-2" to="/jugadores">
             Jugadores
           </Link>
 
-          <Link
-            className="btn btn-outline-light"
-            to="/partidos"
-          >
+          <Link className="btn btn-outline-light" to="/partidos">
             Partidos
           </Link>
-
         </div>
 
       </div>
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
