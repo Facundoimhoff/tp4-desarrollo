@@ -27,6 +27,14 @@ Jugador.belongsTo(Equipo, { foreignKey: 'idEquipo', as: 'equipo' });
 Torneo.hasMany(Partido, { foreignKey: 'idTorneo', as: 'partidos' });
 Partido.belongsTo(Torneo, { foreignKey: 'idTorneo', as: 'torneo' });
 
+// Partido - Equipo (Local y Visitante)
+Partido.belongsTo(Equipo, { foreignKey: 'idEquipoLocal', as: 'local' });
+Partido.belongsTo(Equipo, { foreignKey: 'idEquipoVisitante', as: 'visitante' });
+
+// Relaciones inversas (para que un equipo pueda buscar sus partidos)
+Equipo.hasMany(Partido, { foreignKey: 'idEquipoLocal', as: 'partidosLocal' });
+Equipo.hasMany(Partido, { foreignKey: 'idEquipoVisitante', as: 'partidosVisitante' });
+
 // Partido - GolMinuto (1 a Muchos)
 Partido.hasMany(GolMinuto, { foreignKey: 'idPartido', as: 'goles' });
 GolMinuto.belongsTo(Partido, { foreignKey: 'idPartido', as: 'partido' });

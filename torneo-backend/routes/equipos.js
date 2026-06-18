@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const { Equipo, Torneo } = require('../models');
 
-// Middleware de validación [cite: 158-168]
+// Middleware de validación para crear y editar equipos
 const validateEquipo = [
   body('nombre').trim().notEmpty().withMessage('El nombre es obligatorio'),
   body('localidad').trim().notEmpty().withMessage('La localidad es obligatoria'),
@@ -85,4 +85,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; // Exportamos el router para usarlo en app.js

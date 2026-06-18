@@ -5,7 +5,7 @@ const { Op } = require('sequelize'); // Importamos Op para el filtrado
 const router = express.Router();
 const { Jugador, Equipo } = require('../models');
 
-// Middleware de validación
+// Middleware de validación 
 const validateJugador = [
   body('nombre').trim().notEmpty().withMessage('El nombre es obligatorio'),
   body('apellido').trim().notEmpty().withMessage('El apellido es obligatorio'),
@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
     }
 
     const jugadores = await Jugador.findAll({
-      where: jugadorWhere, // Aplicamos el filtro al query [cite: 209]
+      where: jugadorWhere, // Aplicamos el filtro al query 
       include: {
         model: Equipo,
         as: 'equipo',
