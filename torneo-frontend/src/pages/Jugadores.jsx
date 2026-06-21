@@ -1,163 +1,157 @@
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
+import AppContext from "../context/AppContext";
+import api from "../services/api";
 import {
-  getJugadores,
-  crearJugador,
-  getEquipos,
-} from "../services/api";
+ Button,
+ Form,
+ Table,
+ Card
+} from "react-bootstrap";
 
 function Jugadores() {
-  const [jugadores, setJugadores] = useState([]);
-  const [equipos, setEquipos] = useState([]);
 
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
-  const [dni, setDni] = useState("");
-  const [dorsal, setDorsal] = useState("");
-  const [localidad, setLocalidad] = useState("");
-  const [idEquipo, setIdEquipo] = useState("");
+ const {
+  jugadores,
+  equipos,
+  cargarJugadores
+ } = useContext(AppContext);
 
-  useEffect(() => {
-    cargarJugadores();
-    cargarEquipos();
-  }, []);
+ const [form, setForm] = useState({
+  nombre: "",
+  apellido: "",
+  dni: "",
+  idEquipo: ""
+ });
 
-  async function cargarJugadores() {
-    const data = await getJugadores();
-    setJugadores(data);
-  }
+ const crearJugador = async (e) => {
+  e.preventDefault();
 
-  async function cargarEquipos() {
-    const data = await getEquipos();
-    setEquipos(data);
-  }
+  await api.post("/jugadores", {
+   ...form
+  });
 
-  async function agregarJugador(e) {
-    e.preventDefault();
+  cargarJugadores();
 
-    await crearJugador(
-      nombre,
-      apellido,
-      Number(dni),
-      Number(dorsal),
-      localidad,
-      Number(idEquipo)
-    );
+  setForm({
+   nombre: "",
+   apellido: "",
+   dni: "",
+   idEquipo: ""
+  });
+ };
 
-    setNombre("");
-    setApellido("");
-    setDni("");
-    setDorsal("");
-    setLocalidad("");
-    setIdEquipo("");
+ const eliminarJugador = async (id) => {
+  await api.delete(`/jugadores/${id}`);
+  cargarJugadores();
+ };
 
-    cargarJugadores();
-  }
+ return (
+  <>
+   <h2>Jugadores</h2>
 
-  return (
-    <div className="container mt-4">
+   <Card className="p-3 mb-4">
+    <Form onSubmit={crearJugador}>
+     <Form.Control
+      className="mb-2"
+      placeholder="Nombre"
+      value={form.nombre}
+      onChange={(e) =>
+       setForm({
+        ...form,
+        nombre: e.target.value
+       })
+      }
+     />
 
-      <h1>Jugadores</h1>
+     <Form.Control
+      className="mb-2"
+      placeholder="Apellido"
+      value={form.apellido}
+      onChange={(e) =>
+       setForm({
+        ...form,
+        apellido: e.target.value
+       })
+      }
+     />
 
-      <div className="card p-3 mb-4">
+     <Form.Control
+      className="mb-2"
+      placeholder="DNI"
+      value={form.dni}
+      onChange={(e) =>
+       setForm({
+        ...form,
+        dni: e.target.value
+       })
+      }
+     />
 
-        <form onSubmit={agregarJugador}>
+     <Form.Select
+      className="mb-2"
+      value={form.idEquipo}
+      onChange={(e) =>
+       setForm({
+        ...form,
+        idEquipo: e.target.value
+       })
+      }
+     >
+      <option value="">
+       Seleccionar equipo
+      </option>
 
-          <input
-            className="form-control mb-2"
-            placeholder="Nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-          />
+      {equipos.map((e) => (
+       <option
+        key={e.idEquipo}
+        value={e.idEquipo}
+       >
+        {e.nombre}
+       </option>
+      ))}
+     </Form.Select>
 
-          <input
-            className="form-control mb-2"
-            placeholder="Apellido"
-            value={apellido}
-            onChange={(e) => setApellido(e.target.value)}
-          />
+     <Button type="submit">
+      Crear Jugador
+     </Button>
+    </Form>
+   </Card>
 
-          <input
-            className="form-control mb-2"
-            placeholder="DNI"
-            value={dni}
-            onChange={(e) => setDni(e.target.value)}
-          />
+   <Table striped bordered>
+    <thead>
+     <tr>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>DNI</th>
+      <th>Equipo</th>
+      <th></th>
+     </tr>
+    </thead>
 
-          <input
-            className="form-control mb-2"
-            placeholder="Dorsal"
-            value={dorsal}
-            onChange={(e) => setDorsal(e.target.value)}
-          />
+    <tbody>
+     {jugadores.map((j) => (
+      <tr key={j.idJugador}>
+       <td>{j.nombre}</td>
+       <td>{j.apellido}</td>
+       <td>{j.dni}</td>
+       <td>{j.equipo?.nombre}</td>
 
-          <input
-            className="form-control mb-2"
-            placeholder="Localidad"
-            value={localidad}
-            onChange={(e) => setLocalidad(e.target.value)}
-          />
-
-          <select
-            className="form-select mb-3"
-            value={idEquipo}
-            onChange={(e) => setIdEquipo(e.target.value)}
-          >
-            <option value="">
-              Seleccionar equipo
-            </option>
-
-            {equipos.map((equipo) => (
-              <option
-                key={equipo.idEquipo}
-                value={equipo.idEquipo}
-              >
-                {equipo.nombre}
-              </option>
-            ))}
-          </select>
-
-          <button
-            className="btn btn-success"
-            type="submit"
-          >
-            Agregar Jugador
-          </button>
-
-        </form>
-
-      </div>
-
-      <div className="row">
-
-        {jugadores.map((jugador) => (
-
-          <div
-            key={jugador.idJugador}
-            className="col-md-4 mb-3"
-          >
-
-            <div className="card p-3">
-
-              <h5>
-                {jugador.nombre} {jugador.apellido}
-              </h5>
-
-              <p>DNI: {jugador.dni}</p>
-
-              <p>
-                Equipo: {jugador.equipo?.nombre || "Sin equipo"}
-              </p>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </div>
-  );
+       <td>
+        <Button
+         variant="danger"
+         onClick={() =>
+          eliminarJugador(j.idJugador)
+         }
+        >
+         Eliminar
+        </Button>
+       </td>
+      </tr>
+     ))}
+    </tbody>
+   </Table>
+  </>
+ );
 }
 
 export default Jugadores;

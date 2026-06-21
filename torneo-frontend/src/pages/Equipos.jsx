@@ -1,30 +1,30 @@
-import { useEffect, useState } from "react";
-import { getEquipos, crearEquipo } from "../services/api";
+import { useContext, useState } from "react";
+import AppContext from "../context/AppContext";
+import api from "../services/api";
+import {
+ Button,
+ Form,
+ Table,
+ Card
+} from "react-bootstrap";
 
 function Equipos() {
-  const [equipos, setEquipos] = useState([]);
+ const { equipos, cargarEquipos } = useContext(AppContext);
 
-  const [nombre, setNombre] = useState("");
-  const [localidad, setLocalidad] = useState("");
+ const [nombre, setNombre] = useState("");
+ const [localidad, setLocalidad] = useState("");
 
-  useEffect(() => {
-    cargarEquipos();
-  }, []);
-
-  async function cargarEquipos() {
-    const data = await getEquipos();
-    setEquipos(data);
-  }
-
-  async function agregarEquipo(e) {
+const crearEquipo = async (e) => {
   e.preventDefault();
 
-  console.log("BOTON FUNCIONA");
-
   try {
-    const respuesta = await crearEquipo(nombre, localidad);
+    const res = await api.post("/equipos", {
+      nombre,
+      localidad,
+      idTorneo: 1
+    });
 
-    console.log("RESPUESTA:", respuesta);
+    console.log("CREADO:", res.data);
 
     setNombre("");
     setLocalidad("");
@@ -32,79 +32,82 @@ function Equipos() {
     cargarEquipos();
 
   } catch (error) {
-    console.error("ERROR:", error);
+    console.error("ERROR CREANDO EQUIPO");
+
+    console.log(error);
+
+    if (error.response) {
+      console.log(error.response.data);
+    }
   }
-}
+};
 
-  return (
-    <div className="container mt-4">
+ const eliminarEquipo = async (id) => {
+  await api.delete(`/equipos/${id}`);
+  cargarEquipos();
+ };
 
-      <h1>Equipos</h1>
+ return (
+  <>
+   <h2>Equipos</h2>
 
-      <div className="card p-3 mb-4">
+   <Card className="p-3 mb-4">
+    <Form onSubmit={crearEquipo}>
+     <Form.Group className="mb-2">
+      <Form.Control
+       placeholder="Nombre"
+       value={nombre}
+       onChange={(e) => setNombre(e.target.value)}
+      />
+     </Form.Group>
 
-        <form onSubmit={agregarEquipo}>
+     <Form.Group className="mb-2">
+      <Form.Control
+       placeholder="Localidad"
+       value={localidad}
+       onChange={(e) => setLocalidad(e.target.value)}
+      />
+     </Form.Group>
 
-          <div className="mb-3">
-            <label className="form-label">
-              Nombre
-            </label>
+     <Button type="submit">
+      Crear Equipo
+     </Button>
+    </Form>
+   </Card>
 
-            <input
-              className="form-control"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-            />
-          </div>
+   <Table striped bordered>
+    <thead>
+     <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Localidad</th>
+      <th></th>
+     </tr>
+    </thead>
 
-          <div className="mb-3">
-            <label className="form-label">
-              Localidad
-            </label>
+    <tbody>
+     {equipos.map((equipo) => (
+      <tr key={equipo.idEquipo}>
+       <td>{equipo.idEquipo}</td>
+       <td>{equipo.nombre}</td>
+       <td>{equipo.localidad}</td>
 
-            <input
-              className="form-control"
-              value={localidad}
-              onChange={(e) => setLocalidad(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
-            Agregar Equipo
-          </button>
-
-        </form>
-
-      </div>
-
-      <div className="row">
-
-        {equipos.map((equipo) => (
-
-          <div
-            key={equipo.idEquipo}
-            className="col-md-4 mb-3"
-          >
-
-            <div className="card p-3">
-
-              <h5>{equipo.nombre}</h5>
-
-              <p>{equipo.localidad}</p>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </div>
-  );
+       <td>
+        <Button
+         variant="danger"
+         onClick={() =>
+          eliminarEquipo(equipo.idEquipo)
+         }
+        >
+         Eliminar
+        </Button>
+       </td>
+      </tr>
+     ))}
+    </tbody>
+   </Table>
+  </>
+ );
 }
 
 export default Equipos;

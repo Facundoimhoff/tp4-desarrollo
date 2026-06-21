@@ -1,35 +1,45 @@
+import { useContext } from "react";
+import { Row, Col } from "react-bootstrap";
+
+import AppContext from "../context/AppContext";
+import StatsCard from "../components/StatsCard";
+
 function Dashboard() {
+  const {
+    equipos,
+    jugadores,
+    partidos,
+  } = useContext(AppContext);
+
   return (
-    <div className="container mt-4">
+    <>
+      <h2 className="mb-4">
+        Dashboard
+      </h2>
 
-      <h1>Gestor de Torneo</h1>
+      <Row>
+        <Col md={4}>
+          <StatsCard
+            titulo="Equipos"
+            valor={equipos.length}
+          />
+        </Col>
 
-      <div className="row mt-4">
+        <Col md={4}>
+          <StatsCard
+            titulo="Jugadores"
+            valor={jugadores.length}
+          />
+        </Col>
 
-        <div className="col-md-4">
-          <div className="card p-3">
-            <h3>Equipos</h3>
-            <p>Administrar equipos</p>
-          </div>
-        </div>
-
-        <div className="col-md-4">
-          <div className="card p-3">
-            <h3>Jugadores</h3>
-            <p>Administrar jugadores</p>
-          </div>
-        </div>
-
-        <div className="col-md-4">
-          <div className="card p-3">
-            <h3>Partidos</h3>
-            <p>Administrar partidos</p>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
+        <Col md={4}>
+          <StatsCard
+            titulo="Partidos"
+            valor={partidos.length}
+          />
+        </Col>
+      </Row>
+    </>
   );
 }
 

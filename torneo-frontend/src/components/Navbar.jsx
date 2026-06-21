@@ -1,35 +1,44 @@
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
 
-function Navbar() {
+function CustomNavbar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          Torneo App
+        </Navbar.Brand>
 
-        <Link className="navbar-brand" to="/">
-          ⚽ Torneo
-        </Link>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-        <div>
-          <Link className="btn btn-outline-light me-2" to="/">
-            Dashboard
-          </Link>
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
+            <Nav.Link as={Link} to="/">
+              Inicio
+            </Nav.Link>
 
-          <Link className="btn btn-outline-light me-2" to="/equipos">
-            Equipos
-          </Link>
+            <Nav.Link as={Link} to="/dashboard">
+              Dashboard
+            </Nav.Link>
 
-          <Link className="btn btn-outline-light me-2" to="/jugadores">
-            Jugadores
-          </Link>
+            <Nav.Link as={Link} to="/equipos">
+              Equipos
+            </Nav.Link>
 
-          <Link className="btn btn-outline-light" to="/partidos">
-            Partidos
-          </Link>
-        </div>
+            <Nav.Link as={Link} to="/jugadores">
+              Jugadores
+            </Nav.Link>
 
-      </div>
-    </nav>
+            <Nav.Link as={Link} to="/partidos">
+              Partidos
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
 
-export default Navbar;
+export default CustomNavbar;
