@@ -33,7 +33,12 @@ function CustomNavbar() {
 
             <Nav.Link as={Link} to="/partidos">
               Partidos
+            </Nav.Link> 
+
+            <Nav.Link as={Link} to="/goles">
+             Goles
             </Nav.Link>
+            
           </Nav>
         </Navbar.Collapse>
       </Container>

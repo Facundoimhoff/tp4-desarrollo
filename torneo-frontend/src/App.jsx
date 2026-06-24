@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Equipos from "./pages/Equipos";
 import Jugadores from "./pages/Jugadores";
 import Partidos from "./pages/Partidos";
-
+import Goles from "./pages/Goles"; 
 import "./App.css";
 
 function App() {
@@ -22,6 +22,7 @@ function App() {
           <Route path="/equipos" element={<Equipos />} />
           <Route path="/jugadores" element={<Jugadores />} />
           <Route path="/partidos" element={<Partidos />} />
+          <Route path="/goles" element={<Goles />}/>
         </Routes>
       </div>
     </BrowserRouter>
