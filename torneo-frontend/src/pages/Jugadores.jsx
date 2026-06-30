@@ -26,19 +26,55 @@ function Jugadores() {
  const crearJugador = async (e) => {
   e.preventDefault();
 
-  await api.post("/jugadores", {
-   ...form
-  });
+  if (!form.nombre.trim()) {
+    alert("Debe ingresar el nombre del jugador.");
+    return;
+  }
 
-  cargarJugadores();
+  if (!form.apellido.trim()) {
+    alert("Debe ingresar el apellido del jugador.");
+    return;
+  }
 
-  setForm({
-   nombre: "",
-   apellido: "",
-   dni: "",
-   idEquipo: ""
-  });
- };
+  if (!form.dni.trim()) {
+    alert("Debe ingresar el DNI.");
+    return;
+  }
+
+  if (!/^\d+$/.test(form.dni)) {
+    alert("El DNI solo puede contener números.");
+    return;
+  }
+
+  if (form.dni.length < 7 || form.dni.length > 8) {
+    alert("El DNI debe tener 7 u 8 dígitos.");
+    return;
+  }
+
+  if (!form.idEquipo) {
+    alert("Debe seleccionar un equipo.");
+    return;
+  }
+
+  try {
+    await api.post("/jugadores", {
+      ...form
+    });
+
+    cargarJugadores();
+
+    setForm({
+      nombre: "",
+      apellido: "",
+      dni: "",
+      idEquipo: ""
+    });
+
+  } catch (error) {
+    console.log(error);
+    alert("Error al crear el jugador.");
+  }
+};
 
  const eliminarJugador = async (id) => {
   await api.delete(`/jugadores/${id}`);

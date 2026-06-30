@@ -16,7 +16,15 @@ function Equipos() {
 
 const crearEquipo = async (e) => {
   e.preventDefault();
+   if (!nombre.trim()) {
+    alert("Debe ingresar el nombre del equipo.");
+    return;
+  }
 
+  if (!localidad.trim()) {
+    alert("Debe ingresar la localidad del equipo.");
+    return;
+  }
   try {
     const res = await api.post("/equipos", {
       nombre,

@@ -58,6 +58,24 @@ function Goles() {
   return;
         }
     
+    const partidoSeleccionado =
+  partidos.find(
+    p =>
+      p.idPartido ===
+      Number(form.idPartido)
+  );
+
+if (
+  partidoSeleccionado?.estado ===
+  "Finalizado"
+) {
+
+  alert(
+    "El partido ya fue finalizado"
+  );
+
+  return;
+}
     try {
       await api.post("/goles", {
         minuto: Number(form.minuto),
@@ -88,6 +106,10 @@ function Goles() {
       console.log(error);
     }
   };
+
+  const partidoSeleccionado = partidos.find(
+  (p) => p.idPartido === Number(form.idPartido)
+);
 
   return (
     <Container className="mt-4">
@@ -144,14 +166,23 @@ function Goles() {
       Seleccione un equipo
     </option>
 
-    {equipos.map((eq) => (
-      <option
-        key={eq.idEquipo}
-        value={eq.idEquipo}
-      >
-        {eq.nombre}
-      </option>
-    ))}
+    {equipos
+  .filter(
+    (eq) =>
+      partidoSeleccionado &&
+      (
+        eq.idEquipo === partidoSeleccionado.idEquipoLocal ||
+        eq.idEquipo === partidoSeleccionado.idEquipoVisitante
+      )
+  )
+  .map((eq) => (
+    <option
+      key={eq.idEquipo}
+      value={eq.idEquipo}
+    >
+      {eq.nombre}
+    </option>
+))}
   </Form.Select>
 </Form.Group>
 

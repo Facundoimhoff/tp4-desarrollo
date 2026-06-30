@@ -2,7 +2,13 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
-const { Partido, Torneo, Equipo } = require('../models');
+const {
+  Partido,
+  Torneo,
+  Equipo,
+  GolMinuto,
+  Jugador
+} = require('../models');
 
 const validatePartido = [
   body('fecha').notEmpty().withMessage('La fecha es obligatoria'),
@@ -28,12 +34,40 @@ const validatePartido = [
 router.get('/', async (req, res) => {
   try {
     const partidos = await Partido.findAll({
+  include: [
+    {
+      model: Torneo,
+      as: 'torneo',
+      attributes: ['idTorneo', 'nombre']
+    },
+    {
+      model: Equipo,
+      as: 'local',
+      attributes: ['idEquipo', 'nombre']
+    },
+    {
+      model: Equipo,
+      as: 'visitante',
+      attributes: ['idEquipo', 'nombre']
+    },
+    {
+      model: GolMinuto,
+      as: 'goles',
       include: [
-        { model: Torneo, as: 'torneo', attributes: ['idTorneo', 'nombre'] },
-        { model: Equipo, as: 'local', attributes: ['idEquipo', 'nombre'] },
-        { model: Equipo, as: 'visitante', attributes: ['idEquipo', 'nombre'] }
+        {
+          model: Jugador,
+          as: 'jugador',
+          attributes: ['apellido']
+        },
+        {
+          model: Equipo,
+          as: 'equipo',
+          attributes: ['nombre']
+        }
       ]
-    });
+    }
+  ]
+});
     res.status(200).json(partidos);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -90,4 +124,38 @@ router.delete('/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
+router.patch('/:id/finalizar', async (req, res) => {
+
+  try {
+
+    const partido =
+      await Partido.findByPk(
+        req.params.id
+      );
+
+    if (!partido) {
+      return res
+        .status(404)
+        .json({
+          message:
+            'Partido no encontrado'
+        });
+    }
+
+    partido.estado =
+      "Finalizado";
+
+    await partido.save();
+
+    res.json(partido);
+
+  } catch (error) {
+
+    res.status(500).json({
+      error: error.message
+    });
+
+  }
+
+});
 module.exports = router;

@@ -1,159 +1,252 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Container, Row, Col, Table } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 
 function Home() {
+
   const [partidos, setPartidos] = useState([]);
-  const [goles, setGoles] = useState([]);
 
   useEffect(() => {
-    cargarDatos();
+    cargarPartidos();
   }, []);
 
-  const cargarDatos = async () => {
+  const cargarPartidos = async () => {
     try {
-      const [partidosRes, golesRes] = await Promise.all([
-        api.get("/partidos"),
-        api.get("/goles")
-      ]);
-
-      setPartidos(partidosRes.data);
-      setGoles(golesRes.data);
+      const res = await api.get("/partidos");
+      setPartidos(res.data);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const calcularResultado = (partido) => {
+
+    if (!partido.goles) {
+      return "0 - 0";
+    }
+
+    const golesLocal =
+      partido.goles.filter(
+        g => g.idEquipo === partido.idEquipoLocal
+      ).length;
+
+    const golesVisitante =
+      partido.goles.filter(
+        g => g.idEquipo === partido.idEquipoVisitante
+      ).length;
+
+    return `${golesLocal} - ${golesVisitante}`;
+  };
+
+  const programados =
+    partidos.filter(
+      p => p.estado === "Programado"
+    );
+
+  const finalizados =
+    partidos.filter(
+      p => p.estado === "Finalizado"
+    );
+
   return (
-    <Container className="mt-4">
+    <Container>
 
-      <div className="text-center mb-5">
-        <h1>Copa Sudamericana 2025</h1>
+      <div className="text-center mt-4 mb-5">
 
-        <p className="mt-3">
-          Sistema de gestión de equipos, jugadores,
-          partidos y estadísticas del torneo.
+        <h1>Copa Sudamericana</h1>
+
+        <p>
+          Sistema de gestión de torneos,
+          equipos, jugadores y resultados.
         </p>
 
         <Button
           as={Link}
           to="/dashboard"
-          variant="primary"
         >
           Ir al Dashboard
         </Button>
+
       </div>
 
       <Row>
 
         <Col md={6}>
+
           <Card className="mb-4">
+
             <Card.Header>
               Próximos Partidos
             </Card.Header>
 
             <Card.Body>
 
-              <Table striped hover>
+              {programados.length === 0 ? (
+                <p>No hay partidos programados.</p>
+              ) : (
+                programados.map((p) => (
 
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Local</th>
-                    <th>Visitante</th>
-                  </tr>
-                </thead>
+                  <div
+                    key={p.idPartido}
+                    className="mb-3"
+                  >
+                    <strong>
+                      {new Date(
+                        p.fecha
+                      ).toLocaleDateString(
+                        "es-AR"
+                      )}
+                    </strong>
 
-                <tbody>
+                    <br />
 
-                  {partidos.length === 0 ? (
-                    <tr>
-                      <td colSpan="3">
-                        No hay partidos cargados.
-                      </td>
-                    </tr>
-                  ) : (
-                    partidos.map((p) => (
-                      <tr key={p.idPartido}>
-                        <td>
-                          {new Date(
-                            p.fecha
-                          ).toLocaleDateString("es-AR")}
-                        </td>
+                    {p.local?.nombre}
+                    {" vs "}
+                    {p.visitante?.nombre}
 
-                        <td>
-                          {p.local?.nombre}
-                        </td>
+                  </div>
 
-                        <td>
-                          {p.visitante?.nombre}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-
-                </tbody>
-
-              </Table>
+                ))
+              )}
 
             </Card.Body>
+
           </Card>
+
         </Col>
 
         <Col md={6}>
-          <Card className="mb-4">
+
+          <Card>
+
             <Card.Header>
-              Últimos Goles Registrados
+              Resultados
             </Card.Header>
 
             <Card.Body>
 
-              <Table striped hover>
+              {finalizados.length === 0 ? (
+                <p>No hay partidos finalizados.</p>
+              ) : (
+                finalizados.map((p) => (
 
-                <thead>
-                  <tr>
-                    <th>Jugador</th>
-                    <th>Equipo</th>
-                    <th>Minuto</th>
-                  </tr>
-                </thead>
+                  <div
+                    key={p.idPartido}
+                    className="mb-4"
+                  >
 
-                <tbody>
+                    <strong>
 
-                  {goles.length === 0 ? (
-                    <tr>
-                      <td colSpan="3">
-                        No hay goles registrados.
-                      </td>
-                    </tr>
-                  ) : (
-                    [...goles]
-                      .reverse()
-                      .slice(0, 5)
-                      .map((g) => (
-                        <tr key={g.idGol}>
-                          <td>
-                            {g.jugador?.apellido}
-                          </td>
+                      {p.local?.nombre}
 
-                          <td>
-                            {g.equipo?.nombre}
-                          </td>
+                      {" "}
 
-                          <td>
-                            {g.minuto}'
-                          </td>
-                        </tr>
-                      ))
-                  )}
+                      {
+                        calcularResultado(
+                          p
+                        )
+                      }
 
-                </tbody>
+                      {" "}
 
-              </Table>
+                      {p.visitante?.nombre}
+
+                    </strong>
+
+                    <div className="mt-3">
+
+  <div className="border rounded p-2 mb-2 bg-light">
+
+    <strong className="text-primary">
+      🏠 {p.local?.nombre}
+    </strong>
+
+    <div className="ms-3 mt-2">
+
+      {p.goles
+        ?.filter(
+          g => g.idEquipo === p.idEquipoLocal
+        )
+        .sort(
+          (a, b) => a.minuto - b.minuto
+        )
+        .map((g) => (
+
+          <div key={g.idGol}>
+            ⚽ {g.jugador?.apellido} ({g.minuto}')
+          </div>
+
+        ))}
+
+      {p.goles?.filter(
+        g => g.idEquipo === p.idEquipoLocal
+      ).length === 0 && (
+
+        <small className="text-muted">
+          Sin goles
+        </small>
+
+      )}
+
+    </div>
+
+  </div>
+
+  <div className="border rounded p-2 bg-light">
+
+    <strong className="text-danger">
+      🚌 {p.visitante?.nombre}
+    </strong>
+
+    <div className="ms-3 mt-2">
+
+      {p.goles
+        ?.filter(
+          g => g.idEquipo === p.idEquipoVisitante
+        )
+        .sort(
+          (a, b) => a.minuto - b.minuto
+        )
+        .map((g) => (
+
+          <div key={g.idGol}>
+            ⚽ {g.jugador?.apellido} ({g.minuto}')
+          </div>
+
+        ))}
+
+      {p.goles?.filter(
+        g => g.idEquipo === p.idEquipoVisitante
+      ).length === 0 && (
+
+        <small className="text-muted">
+          Sin goles
+        </small>
+
+      )}
+
+    </div>
+
+  </div>
+
+</div>
+
+                  </div>
+
+                ))
+              )}
 
             </Card.Body>
+
           </Card>
+
         </Col>
 
       </Row>
@@ -163,3 +256,4 @@ function Home() {
 }
 
 export default Home;
+
